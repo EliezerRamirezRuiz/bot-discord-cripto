@@ -24,26 +24,23 @@ def show_ticker(cripto: str) -> str:
     should pass a string and if you pass other values, this gonna pass a error"""
     try:
         task = binance.fetch_ticker(cripto)
-        if task != None:
-            ticker = f'''symbol: {task["symbol"]},
-                            date time: {task["datetime"]},
-                            high: {task["high"]},
-                            low: {task["low"]},
-                            open: {task["open"]},
-                            close: {task["close"]},
-                            change: {task["change"]}'''
-            return ticker
+        ticker = f'''symbol: {task["symbol"]},
+                        date time: {task["datetime"]},
+                        high: {task["high"]},
+                        low: {task["low"]},
+                        open: {task["open"]},
+                        close: {task["close"]},
+                        change: {task["change"]}'''
+        return ticker
         
     except TypeError:
         return 'Only string, please try again'
 
 # Function to return a valid json object
 async def json_url():
-    """
-    The function return a json from the https://api.binance.com/api/v3/ticker/price 
+    """The function return a json from the https://api.binance.com/api/v3/ticker/price 
     that it'll be used in the function get_keys_cripto to return all keys into the json 
-    object
-    """
+    object"""
     async with aiohttp.ClientSession() as resp:
         async with resp.get('https://api.binance.com/api/v3/ticker/price') as t:
             text = await t.json()
@@ -64,16 +61,16 @@ async def get_keys_cripto(list_cripto=None) -> None:
 
     if list_cripto is None:
         list_cripto = []
-        try:
-            values_cripto = await json_url()
+    try:
+        values_cripto = await json_url()
 
-            for i in values_cripto:
-                list_cripto.append(i['symbol'])
+        for i in values_cripto:
+            list_cripto.append(i['symbol'])
 
-            return list_cripto
+        return list_cripto
 
-        except:
-            return error_cripto
+    except:
+        return error_cripto
 
 
 # Function get price
@@ -110,18 +107,27 @@ async def get_info_cripto(symbol:str) -> list:
 
 
 # Function convert async
-async def convert_string(a) -> str:
+async def convert_to_string(a) -> str:
     obj = await a
     b = " ".join(obj)
     return b
 
 
-# Function normal
-def convert_message_embed(Title:str, Url:str|None, Description:str, Name:str|None, Value:str|None, Text:str|None):
-    """Function to create a message embed with paremeters so basic"""
-    message = Embed(title=Title, url=Url,
-                    description=Description, color=1)
-    message.add_field(name=Name, value=Value, inline=False)
-    message.set_footer(text=Text)
+# Write file
+async def write(file:str):
+    with open(file, 'r+') as f:
+        word = await get_keys_cripto()
+        for number, line in enumerate(word):
+            number += 1
+            f.write(f'{line} ')
+            if number % 5 == 0:
+                f.write('\n')
 
-    return message
+
+
+# Truncate content from file
+async def truncate(file:str):
+    with open(file, 'r+') as f:
+        f.truncate()
+
+    
